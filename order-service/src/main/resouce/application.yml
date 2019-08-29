@@ -1,0 +1,59 @@
+# 内置服务器的配置
+server:
+  port: 8781
+
+# 工程服务的名称
+spring:
+  application:
+    name: order-service
+    
+# eureka register center
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+      
+# Ribbon config
+product-service:
+  ribbon:
+    # 策略类,默认为轮询的形式进行调用.如果部署的机器性能都大致相同,让其为默认设置就好.(也可以根据权重来进行分配)
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+    
+# Feign config
+feign:
+  hystrix:
+    # 开启hystrix的熔断机制,新版本(次版本)默认是关闭的,且会将下面的client的配置覆盖,因为hystrix会对fegin进行再次包装,
+    # 所以,会对client的配置重新设定,默认超时时间为一秒,即使下面的client配置的是四秒但是也不会生效!!!
+    enabled: true
+  client:
+    config:
+      default:
+        # feign的连接-传输最大时长
+        connectTimeout: 4000
+        readTimeout: 4000
+        
+#把hystrix超时时间禁用
+#hystrix:
+#  command:
+#    default:
+#      execution:
+#        timeout:
+#          enabled: false
+
+#execution.isolation.thread.timeoutInMilliseconds=4000
+
+#设置超时时间
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 4000
+
+#暴露全部的监控信息
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
